@@ -21,9 +21,9 @@ public class Contacto {
     @PrimaryKey(autoGenerate = true)
     private long id;
 
-    private long alarmaId;     // A qué alarma pertenece este contacto
+    private long alarmaId;     // A que alarma pertenece este contacto
     private String nombre;     // Nombre del contacto
-    private String telefono;   // Numero (ej: "+34666123456" o "666123456")
+    private String telefono;   // Numero "+34666123456"
     private String mensaje;    // Mensaje que se enviara al activar la alarma
 
     public Contacto(long alarmaId, String nombre, String telefono, String mensaje) {

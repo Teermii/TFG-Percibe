@@ -42,9 +42,9 @@ public class NuevaAlarmaActivity extends AppCompatActivity {
     private Button btnRepeticion; // atributo de clase para usarlo en el launcher
     private List<Categoria> listaCategorias = new ArrayList<>();
     private Long categoriaSeleccionadaId = null;
-    private boolean repLunes, repMartes, repMiercoles, repJueves,
-                    repViernes, repSabado, repDomingo;
+    private boolean repLunes, repMartes, repMiercoles, repJueves, repViernes, repSabado, repDomingo;
 
+    // Launcher para abrir el mapa y reibir la ubicación seleccionada
     private final ActivityResultLauncher<Intent> mapaLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
@@ -52,6 +52,7 @@ public class NuevaAlarmaActivity extends AppCompatActivity {
                     double longitud = result.getData().getDoubleExtra("longitud", 0);
                     ubicacionSeleccionada = new LatLng(latitud, longitud);
 
+                    // Convertimos las coordenadas en una dirección legible (en un hilo)
                     new Thread(() -> {
                         try {
                             Geocoder geocoder = new Geocoder(this, Locale.getDefault());
@@ -69,6 +70,7 @@ public class NuevaAlarmaActivity extends AppCompatActivity {
                 }
             });
 
+    // Launcher para abrir la pantalla de repeticion y recibir los dias marcados
     private final ActivityResultLauncher<Intent> repeticionLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
@@ -88,6 +90,7 @@ public class NuevaAlarmaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nueva_alarma);
 
+        // Pedimos el ViewModel (Android lo reutiliza si ya existia)
         viewModel = new ViewModelProvider(this).get(AlarmaViewModel.class);
 
         etNombre      = findViewById(R.id.etNombre);
@@ -99,27 +102,27 @@ public class NuevaAlarmaActivity extends AppCompatActivity {
         Spinner spinnerCategoria = findViewById(R.id.spinnerCategoria);
         EditText etNota = findViewById(R.id.etNota);
 
-        // ── Categorías ────────────────────────────────────────────────────────
-        CategoriaViewModel categoriaViewModel = new ViewModelProvider(this)
-                .get(CategoriaViewModel.class);
+        // Cargar categorias
+        CategoriaViewModel categoriaViewModel = new ViewModelProvider(this).get(CategoriaViewModel.class);
 
+        // observe = "cuando lleguen las categorías, ejecuta esto"
         categoriaViewModel.getTodasLasCategorias().observe(this, categorias -> {
             listaCategorias = categorias;
             List<String> nombres = new ArrayList<>();
             nombres.add("Sin categoría");
             for (Categoria c : categorias) nombres.add(c.getNombre());
-            ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
-                    this, android.R.layout.simple_spinner_item, nombres);
-            spinnerAdapter.setDropDownViewResource(
-                    android.R.layout.simple_spinner_dropdown_item);
+            ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, nombres);
+            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerCategoria.setAdapter(spinnerAdapter);
         });
 
+        // Cuando se elige una categoria
         spinnerCategoria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position == 0) {
                     categoriaSeleccionadaId = null;
+                    // -1 porque el 0 del array es sin categoria
                 } else if (position - 1 < listaCategorias.size()) {
                     categoriaSeleccionadaId = listaCategorias.get(position - 1).getId();
                 }
@@ -128,11 +131,16 @@ public class NuevaAlarmaActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // ── Mapa ──────────────────────────────────────────────────────────────
-        btnAbrirMapa.setOnClickListener(v ->
-                mapaLauncher.launch(new Intent(this, MapaActivity.class)));
+        btnAbrirMapa.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MapaActivity.class);
+            String r = etRadio.getText().toString().trim();
+            double radioMapa = 100;
+            try { radioMapa = Double.parseDouble(r); } catch (NumberFormatException ignored) {}
+            intent.putExtra("radio", radioMapa);
+            mapaLauncher.launch(intent);
+        });
 
-        // ── Repetición ────────────────────────────────────────────────────────
+        // Repeticion
         btnRepeticion.setOnClickListener(v -> {
             Intent intent = new Intent(this, RepeticionActivity.class);
             intent.putExtra("lunes",     repLunes);
@@ -145,11 +153,12 @@ public class NuevaAlarmaActivity extends AppCompatActivity {
             repeticionLauncher.launch(intent);
         });
 
-        // ── Guardar ───────────────────────────────────────────────────────────
+        // Guardar
         btnGuardar.setOnClickListener(v -> {
             String nombre   = etNombre.getText().toString().trim();
             String radioStr = etRadio.getText().toString().trim();
 
+            // Validacion de que este todo escrito
             if (nombre.isEmpty()) {
                 Toast.makeText(this, "Escribe un nombre", Toast.LENGTH_SHORT).show();
                 return;
@@ -159,10 +168,17 @@ public class NuevaAlarmaActivity extends AppCompatActivity {
                 return;
             }
 
-            double radio = radioStr.isEmpty() ? 100 : Double.parseDouble(radioStr);
+            double radio;
+            try {
+                radio = radioStr.isEmpty() ? 100 : Double.parseDouble(radioStr);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "El radio debe ser un número", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             String nota = etNota.getText().toString().trim();
 
+            // No ponemos la id, ya que, lo pone Room
             Alarma nueva = new Alarma(
                     nombre,
                     ubicacionSeleccionada.latitude,
@@ -188,6 +204,7 @@ public class NuevaAlarmaActivity extends AppCompatActivity {
         btnCancelar.setOnClickListener(v -> finish());
     }
 
+    // Convierte el dia a una letra para que entre bien
     private String obtenerTextoDias() {
         StringBuilder sb = new StringBuilder();
         if (repLunes)     sb.append("L ");

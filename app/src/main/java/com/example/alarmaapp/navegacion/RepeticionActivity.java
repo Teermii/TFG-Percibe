@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.alarmaapp.R;
 
+// Pantalla con 7 casillas para elgir que dias queremos que se repita la alarma
 public class RepeticionActivity extends AppCompatActivity {
 
     @Override
@@ -16,7 +17,7 @@ public class RepeticionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_repeticion);
 
-        // Recogemos los días que ya estaban seleccionados (si venimos de editar)
+        // Recogemos los dias que ya estaban seleccionados (si venimos de editar)
         boolean lunes     = getIntent().getBooleanExtra("lunes", false);
         boolean martes    = getIntent().getBooleanExtra("martes", false);
         boolean miercoles = getIntent().getBooleanExtra("miercoles", false);
@@ -34,7 +35,7 @@ public class RepeticionActivity extends AppCompatActivity {
         CheckBox cbDomingo   = findViewById(R.id.cbDomingo);
         Button btnGuardar    = findViewById(R.id.btnGuardar);
 
-        // Precargamos los días seleccionados
+        // Precargamos los dias seleccionados
         cbLunes.setChecked(lunes);
         cbMartes.setChecked(martes);
         cbMiercoles.setChecked(miercoles);
@@ -44,7 +45,7 @@ public class RepeticionActivity extends AppCompatActivity {
         cbDomingo.setChecked(domingo);
 
         btnGuardar.setOnClickListener(v -> {
-            // Devolvemos los días seleccionados a NuevaAlarma/EditarAlarmaActivity
+            // Devolvemos los dias seleccionados a NuevaAlarma/EditarAlarmaActivity
             Intent resultado = new Intent();
             resultado.putExtra("lunes",     cbLunes.isChecked());
             resultado.putExtra("martes",    cbMartes.isChecked());

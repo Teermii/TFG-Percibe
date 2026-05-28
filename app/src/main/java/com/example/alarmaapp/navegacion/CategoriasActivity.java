@@ -31,7 +31,6 @@ public class CategoriasActivity extends AppCompatActivity {
             "#43A047", // Verde
             "#FB8C00", // Naranja
             "#8E24AA", // Morado
-            "#00ACC1"  // Cian
     };
 
     private String colorSeleccionado = "#1A73E8"; // Azul por defecto
@@ -48,15 +47,14 @@ public class CategoriasActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(CategoriaViewModel.class);
 
         adapter = new CategoriaAdapter(
-                // Click en categoría → editar
                 categoria -> mostrarDialogoEditar(categoria),
-                // Click en borrar → eliminar
                 categoria -> viewModel.eliminar(categoria)
         );
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        // Cuando se cambian las categorias actualizamos la lista
         viewModel.getTodasLasCategorias().observe(this, categorias -> {
             adapter.setCategorias(categorias);
             tvVacia.setVisibility(categorias.isEmpty() ? View.VISIBLE : View.GONE);
@@ -66,22 +64,22 @@ public class CategoriasActivity extends AppCompatActivity {
         fabAdd.setOnClickListener(v -> mostrarDialogoCrear());
     }
 
+    // Dialoo para crear una categoria
     private void mostrarDialogoCrear() {
-        View dialogView = LayoutInflater.from(this)
-                .inflate(R.layout.dialog_categoria, null);
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_categoria, null);
 
         EditText etNombre    = dialogView.findViewById(R.id.etNombre);
         RadioGroup rgColores = dialogView.findViewById(R.id.rgColores);
 
         colorSeleccionado = COLORES[0]; // Azul por defecto
 
+        // Guardamos que color hemos elegido
         rgColores.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.rbAzul)    colorSeleccionado = COLORES[0];
             if (checkedId == R.id.rbRojo)    colorSeleccionado = COLORES[1];
             if (checkedId == R.id.rbVerde)   colorSeleccionado = COLORES[2];
             if (checkedId == R.id.rbNaranja) colorSeleccionado = COLORES[3];
             if (checkedId == R.id.rbMorado)  colorSeleccionado = COLORES[4];
-            if (checkedId == R.id.rbCian)    colorSeleccionado = COLORES[5];
         });
 
         new AlertDialog.Builder(this)
@@ -97,6 +95,7 @@ public class CategoriasActivity extends AppCompatActivity {
                 .show();
     }
 
+    // Dialogo para editar
     private void mostrarDialogoEditar(Categoria categoria) {
         View dialogView = LayoutInflater.from(this)
                 .inflate(R.layout.dialog_categoria, null);
@@ -113,7 +112,6 @@ public class CategoriasActivity extends AppCompatActivity {
         if (colorSeleccionado.equals(COLORES[2])) rgColores.check(R.id.rbVerde);
         if (colorSeleccionado.equals(COLORES[3])) rgColores.check(R.id.rbNaranja);
         if (colorSeleccionado.equals(COLORES[4])) rgColores.check(R.id.rbMorado);
-        if (colorSeleccionado.equals(COLORES[5])) rgColores.check(R.id.rbCian);
 
         rgColores.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.rbAzul)    colorSeleccionado = COLORES[0];
@@ -121,7 +119,6 @@ public class CategoriasActivity extends AppCompatActivity {
             if (checkedId == R.id.rbVerde)   colorSeleccionado = COLORES[2];
             if (checkedId == R.id.rbNaranja) colorSeleccionado = COLORES[3];
             if (checkedId == R.id.rbMorado)  colorSeleccionado = COLORES[4];
-            if (checkedId == R.id.rbCian)    colorSeleccionado = COLORES[5];
         });
 
         new AlertDialog.Builder(this)

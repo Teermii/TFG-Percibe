@@ -16,7 +16,7 @@ public interface HistorialDao {
     @Insert
     void insertar(HistorialActivacion activacion);
 
-    // Todo el historial ordenado de más nuevo a más antiguo
+    // Todo el historial ordenado de mas nuevo a mas antiguo
     @Query("SELECT * FROM historial ORDER BY id DESC")
     LiveData<List<HistorialActivacion>> getTodoElHistorial();
 
@@ -24,19 +24,19 @@ public interface HistorialDao {
     @Query("SELECT * FROM historial WHERE alarmaId = :alarmaId ORDER BY id DESC")
     LiveData<List<HistorialActivacion>> getHistorialPorAlarma(long alarmaId);
 
-    // Número de veces que se ha activado una alarma concreta
+    // Numero de veces que se ha activado una alarma concreta
     @Query("SELECT COUNT(*) FROM historial WHERE alarmaId = :alarmaId")
     LiveData<Integer> getNumActivaciones(long alarmaId);
 
-    // Última activación de una alarma concreta
+    // Ultima activación de una alarma concreta
     @Query("SELECT * FROM historial WHERE alarmaId = :alarmaId ORDER BY id DESC LIMIT 1")
     LiveData<HistorialActivacion> getUltimaActivacion(long alarmaId);
 
-    // Total de activaciones de TODAS las alarmas
+    // Total de activaciones de todas las alarmas
     @Query("SELECT COUNT(*) FROM historial")
     LiveData<Integer> getTotalActivaciones();
 
-    // Alarma que más se ha activado (nombre + cuántas veces)
+    // Alarma que mas se ha activado (nombre + cuantas veces)
     @Query("SELECT nombreAlarma, COUNT(*) as veces FROM historial " +
             "GROUP BY alarmaId ORDER BY veces DESC LIMIT 1")
     LiveData<AlarmaMasActivada> getAlarmaMasActivada();
@@ -45,7 +45,7 @@ public interface HistorialDao {
     @Query("SELECT COUNT(*) FROM historial WHERE fecha = :hoy")
     LiveData<Integer> getActivacionesHoy(String hoy);
 
-    // Activaciones de esta semana (últimos 7 días)
-    @Query("SELECT COUNT(*) FROM historial")
-    LiveData<Integer> getActivacionesUltimaSemana();
+    // Activaciones de esta semana (pasar los 7 días en formato dd/MM/yyyy)
+    @Query("SELECT COUNT(*) FROM historial WHERE fecha IN (:fechas)")
+    LiveData<Integer> getActivacionesUltimaSemana(List<String> fechas);
 }

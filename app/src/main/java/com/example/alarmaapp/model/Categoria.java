@@ -9,8 +9,8 @@ public class Categoria {
     @PrimaryKey(autoGenerate = true)
     private long id;
 
-    private String nombre;  // Ej: "Trabajo", "Casa", "Viajes"
-    private String color;   // Ej: "#1A73E8", "#E53935", "#43A047"
+    private String nombre;  // Ej: "Trabajo", "Casa"
+    private String color;   // Ej: "#1A73E8"
 
     public Categoria(String nombre, String color) {
         this.nombre = nombre;

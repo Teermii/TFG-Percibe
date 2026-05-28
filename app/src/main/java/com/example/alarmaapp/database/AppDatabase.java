@@ -13,14 +13,16 @@ import com.example.alarmaapp.model.Repeticion;
 import com.example.alarmaapp.model.Contacto;
 import com.example.alarmaapp.model.Configuracion;
 
+// Declaramos todas las tablas y la versión del esquema
 @Database(
         entities = {Alarma.class, HistorialActivacion.class, Categoria.class,
-                Repeticion.class, Contacto.class, Configuracion.class }, // Añadimos Configuracion
-        version = 7, // Subimos la versión
+                Repeticion.class, Contacto.class, Configuracion.class },
+        version = 8,
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {
 
+    // Instancia estatica para el singletone
     private static AppDatabase instancia;
 
     public abstract AlarmaDao alarmaDao();
@@ -28,8 +30,9 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract CategoriaDao categoriaDao();
     public abstract RepeticionDao repeticionDao();
     public abstract ContactoDao contactoDao();
-    public abstract ConfiguracionDao configuracionDao(); // Nuevo DAO
+    public abstract ConfiguracionDao configuracionDao();
 
+    // Patron singletone sincronizado para asegurarnos de que solo haya 1 instancia de la BD
     public static synchronized AppDatabase getInstance(Context context) {
         if (instancia == null) {
             instancia = Room.databaseBuilder(

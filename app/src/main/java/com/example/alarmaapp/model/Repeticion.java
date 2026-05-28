@@ -15,9 +15,7 @@ import androidx.room.PrimaryKey;
 )
 public class Repeticion {
 
-    @PrimaryKey(autoGenerate = true)
-    private long id;
-
+    @PrimaryKey
     private long alarmaId;
 
     private boolean lunes;
@@ -39,9 +37,6 @@ public class Repeticion {
         this.sabado    = sabado;
         this.domingo   = domingo;
     }
-
-    public long getId() { return id; }
-    public void setId(long id) { this.id = id; }
 
     public long getAlarmaId() { return alarmaId; }
     public void setAlarmaId(long alarmaId) { this.alarmaId = alarmaId; }

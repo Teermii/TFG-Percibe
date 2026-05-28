@@ -32,6 +32,7 @@ public class AlarmaAdapter extends RecyclerView.Adapter<AlarmaAdapter.AlarmaView
     private OnAlarmaClickListener listener;
     private List<Categoria> categorias = new ArrayList<>();
 
+    // Interfaz para avisar a la pantalla cuando se toca una alarma
     public interface OnAlarmaClickListener {
         void onAlarmaClick(Alarma alarma);
     }
@@ -112,24 +113,24 @@ public class AlarmaAdapter extends RecyclerView.Adapter<AlarmaAdapter.AlarmaView
         notifyDataSetChanged(); // avisa de que han habido cambios
     }
 
-    // ViewHolder — representa cada item de la lista
+    public void setCategorias(List<Categoria> categorias) {
+        this.categorias = categorias;
+        notifyDataSetChanged();
+    }
+
+    // ViewHolder, representa cada item de la lista
     static class AlarmaViewHolder extends RecyclerView.ViewHolder {
         TextView tvNombre;
         TextView tvRadio;
-        TextView tvCategoria; // Añadir esto
+        TextView tvCategoria;
         com.google.android.material.switchmaterial.SwitchMaterial switchActiva;
 
         public AlarmaViewHolder(@NonNull View itemView) {
             super(itemView);
             tvNombre     = itemView.findViewById(R.id.tvNombre);
             tvRadio      = itemView.findViewById(R.id.tvRadio);
-            tvCategoria  = itemView.findViewById(R.id.tvCategoria); // Añadir esto
+            tvCategoria  = itemView.findViewById(R.id.tvCategoria);
             switchActiva = itemView.findViewById(R.id.switchActiva);
         }
-    }
-
-    public void setCategorias(List<Categoria> categorias) {
-        this.categorias = categorias;
-        notifyDataSetChanged();
     }
 }

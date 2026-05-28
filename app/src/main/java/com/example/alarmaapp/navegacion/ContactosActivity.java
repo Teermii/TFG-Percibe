@@ -18,6 +18,7 @@ import com.example.alarmaapp.view.ContactoAdapter;
 import com.example.alarmaapp.viewmodel.ContactoViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+// Lista de contactos sobre cada alarma
 public class ContactosActivity extends AppCompatActivity {
 
     private ContactoViewModel viewModel;
@@ -31,6 +32,7 @@ public class ContactosActivity extends AppCompatActivity {
 
         // Recibimos el ID de la alarma desde NuevaAlarma/EditarAlarma
         alarmaId = getIntent().getLongExtra("alarmaId", -1);
+        if (alarmaId == -1) { finish(); return; }
 
         TextView tvTitulo            = findViewById(R.id.tvTitulo);
         RecyclerView recyclerView    = findViewById(R.id.recyclerView);
@@ -52,6 +54,7 @@ public class ContactosActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        // Observamos solo los contactos de esta alarma
         viewModel.getContactosPorAlarma(alarmaId).observe(this, contactos -> {
             adapter.setContactos(contactos);
             tvVacia.setVisibility(contactos.isEmpty() ? View.VISIBLE : View.GONE);
@@ -61,9 +64,9 @@ public class ContactosActivity extends AppCompatActivity {
         fabAdd.setOnClickListener(v -> mostrarDialogoCrear());
     }
 
+    // Dialogo para crear contacto
     private void mostrarDialogoCrear() {
-        View dialogView = LayoutInflater.from(this)
-                .inflate(R.layout.dialog_contacto, null);
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_contacto, null);
 
         EditText etNombre   = dialogView.findViewById(R.id.etNombre);
         EditText etTelefono = dialogView.findViewById(R.id.etTelefono);
@@ -78,6 +81,7 @@ public class ContactosActivity extends AppCompatActivity {
                     String mensaje  = etMensaje.getText().toString().trim();
 
                     if (!nombre.isEmpty() && !telefono.isEmpty()) {
+                        // ponemos uno por defecto sino elige un mensaje el usuario
                         if (mensaje.isEmpty()) {
                             mensaje = "Estoy en la zona de la alarma.";
                         }
@@ -88,6 +92,7 @@ public class ContactosActivity extends AppCompatActivity {
                 .show();
     }
 
+    // Dialogo para editar
     private void mostrarDialogoEditar(Contacto contacto) {
         View dialogView = LayoutInflater.from(this)
                 .inflate(R.layout.dialog_contacto, null);

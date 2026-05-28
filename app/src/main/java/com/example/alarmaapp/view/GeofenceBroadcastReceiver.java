@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+// La clase a la que s avisa cuando se entra en una zona vigilada
 public class GeofenceBroadcastReceiver extends BroadcastReceiver {
 
     private static final String TAG = "GeofenceReceiver";
@@ -32,6 +33,7 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
+        // Cogemos la info
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
 
         if (geofencingEvent == null || geofencingEvent.hasError()) {
@@ -40,25 +42,40 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
 
         int transicion = geofencingEvent.getGeofenceTransition();
 
+        // Verificamos que se haya entrado en la zona y no salido
         if (transicion == Geofence.GEOFENCE_TRANSITION_ENTER) {
 
             List<Geofence> disparadas = geofencingEvent.getTriggeringGeofences();
             if (disparadas == null || disparadas.isEmpty()) return;
 
+            // El id del geofence es el id de la alarma
             String idGeofence = disparadas.get(0).getRequestId();
 
+            long alarmaIdParsed;
+            try {
+                alarmaIdParsed = Long.parseLong(idGeofence);
+            } catch (NumberFormatException e) {
+                Log.e(TAG, "ID de geofence inválido: " + idGeofence, e);
+                return;
+            }
+
+            // goAsync() mantiene el proceso vivo hasta que el hilo llame a pendingResult.finish()
+            final PendingResult pendingResult = goAsync();
+
             new Thread(() -> {
+                try {
                 AppDatabase db = AppDatabase.getInstance(context);
-                Alarma alarma = db.alarmaDao().getAlarmaPorIdDirecto(Long.parseLong(idGeofence));
+                Alarma alarma = db.alarmaDao().getAlarmaPorIdDirecto(alarmaIdParsed);
 
                 if (alarma == null) return;
 
-                // ── Comprobar repetición ──────────────────────────────────────
+                // Comprobar repetición
                 Repeticion rep = db.repeticionDao().getRepeticionPorAlarmaDirecto(alarma.getId());
                 if (rep != null) {
                     int diaSemana = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
                     boolean hoyActivo = false;
 
+                    // Comprobamos si el dia de hoy esta marcado
                     switch (diaSemana) {
                         case Calendar.MONDAY:    hoyActivo = rep.isLunes(); break;
                         case Calendar.TUESDAY:   hoyActivo = rep.isMartes(); break;
@@ -69,6 +86,7 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
                         case Calendar.SUNDAY:    hoyActivo = rep.isDomingo(); break;
                     }
 
+                    // Si hay algun dia marcado pero hoy no es, no suena, sino hay ninguno marcado suena siempre
                     boolean algunDiaSeleccionado = rep.isLunes() || rep.isMartes()
                             || rep.isMiercoles() || rep.isJueves() || rep.isViernes()
                             || rep.isSabado() || rep.isDomingo();
@@ -76,7 +94,7 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
                     if (algunDiaSeleccionado && !hoyActivo) return;
                 }
 
-                // ── Guardar en historial ──────────────────────────────────────
+                // Guardar en historial
                 String fecha = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                         .format(new Date());
                 String hora  = new SimpleDateFormat("HH:mm", Locale.getDefault())
@@ -85,20 +103,22 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
                 db.historialDao().insertar(new HistorialActivacion(
                         alarma.getId(), alarma.getNombre(), fecha, hora));
 
-                // ── Enviar SMS a los contactos ────────────────────────────────
+                // Enviar SMS a los contactos
                 enviarSmsContactos(context, db, alarma.getId());
 
-                // ── Lanzar servicio de alarma (muestra sobre pantalla de bloqueo) ────
+                // Lanzar servicio de alarma (muestra sobre pantalla de bloqueo)
                 Intent alarmaIntent = new Intent(context, AlarmaService.class);
                 alarmaIntent.putExtra("nombre", alarma.getNombre());
                 alarmaIntent.putExtra("nota", alarma.getNota());
                 androidx.core.content.ContextCompat.startForegroundService(context, alarmaIntent);
+                } finally {
+                    pendingResult.finish();
+                }
             }).start();
         }
     }
 
-    /**
-     * Envía un SMS a cada contacto registrado en la alarma con su mensaje personalizado.
+    /* Envía un SMS a cada contacto registrado en la alarma con su mensaje personalizado
      * Si no hay permiso SEND_SMS no hace nada (sin crashear).
      */
     private void enviarSmsContactos(Context context, AppDatabase db, long alarmaId) {

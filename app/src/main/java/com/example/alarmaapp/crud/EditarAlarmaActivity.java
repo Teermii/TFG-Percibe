@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
+// Practicamente igual que NuevaAlarmaActivity
 public class EditarAlarmaActivity extends AppCompatActivity {
 
     private AlarmaViewModel viewModel;
@@ -45,8 +45,7 @@ public class EditarAlarmaActivity extends AppCompatActivity {
     private boolean alarmaActiva;
     private List<Categoria> listaCategorias = new ArrayList<>();
     private Long categoriaSeleccionadaId = null;
-    private boolean repLunes, repMartes, repMiercoles, repJueves,
-                    repViernes, repSabado, repDomingo;
+    private boolean repLunes, repMartes, repMiercoles, repJueves, repViernes, repSabado, repDomingo;
 
     private final ActivityResultLauncher<Intent> mapaLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -92,6 +91,7 @@ public class EditarAlarmaActivity extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this).get(AlarmaViewModel.class);
 
+        // Recibimos todos los datos de la alarma
         etNombre      = findViewById(R.id.etNombre);
         etRadio       = findViewById(R.id.etRadio);
         btnAbrirMapa  = findViewById(R.id.btnAbrirMapa);
@@ -102,7 +102,7 @@ public class EditarAlarmaActivity extends AppCompatActivity {
         Spinner spinnerCategoria = findViewById(R.id.spinnerCategoria);
         EditText etNota = findViewById(R.id.etNota);
 
-        // ── Datos del Intent ──────────────────────────────────────────────────
+        // Datos del Intent
         alarmaId = getIntent().getLongExtra("id", -1);
         String nombre   = getIntent().getStringExtra("nombre");
         double latitud  = getIntent().getDoubleExtra("latitud", 0);
@@ -117,12 +117,12 @@ public class EditarAlarmaActivity extends AppCompatActivity {
         String nota = getIntent().getStringExtra("nota");
         etNota.setText(nota != null ? nota : "");
 
-        // ── Precargar campos ──────────────────────────────────────────────────
+        // Precargar campos
         etNombre.setText(nombre);
         etRadio.setText(String.valueOf(radio));
         ubicacionSeleccionada = new LatLng(latitud, longitud);
 
-        // Mostrar dirección actual en el botón del mapa
+        // Mostrar direccion actual en el boton del mapa
         new Thread(() -> {
             try {
                 Geocoder geocoder = new Geocoder(this, Locale.getDefault());
@@ -136,7 +136,7 @@ public class EditarAlarmaActivity extends AppCompatActivity {
             }
         }).start();
 
-        // ── Precargar repetición ──────────────────────────────────────────────
+        // Precargar repeticion
         AppDatabase db = AppDatabase.getInstance(this);
         new Thread(() -> {
             Repeticion rep = db.repeticionDao().getRepeticionPorAlarmaDirecto(alarmaId);
@@ -152,7 +152,7 @@ public class EditarAlarmaActivity extends AppCompatActivity {
             }
         }).start();
 
-        // ── Categorías ────────────────────────────────────────────────────────
+        // Categorías
         CategoriaViewModel categoriaViewModel = new ViewModelProvider(this)
                 .get(CategoriaViewModel.class);
 
@@ -190,9 +190,14 @@ public class EditarAlarmaActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // ── Botones ───────────────────────────────────────────────────────────
-        btnAbrirMapa.setOnClickListener(v ->
-                mapaLauncher.launch(new Intent(this, MapaActivity.class)));
+        btnAbrirMapa.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MapaActivity.class);
+            String r = etRadio.getText().toString().trim();
+            double radioMapa = 100;
+            try { radioMapa = Double.parseDouble(r); } catch (NumberFormatException ignored) {}
+            intent.putExtra("radio", radioMapa);
+            mapaLauncher.launch(intent);
+        });
 
         btnRepeticion.setOnClickListener(v -> {
             Intent intent = new Intent(this, RepeticionActivity.class);
@@ -223,7 +228,13 @@ public class EditarAlarmaActivity extends AppCompatActivity {
                 return;
             }
 
-            float nuevoRadio = radioStr.isEmpty() ? 100f : Float.parseFloat(radioStr);
+            double nuevoRadio;
+            try {
+                nuevoRadio = radioStr.isEmpty() ? 100.0 : Double.parseDouble(radioStr);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "El radio debe ser un número", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             String nuevaNota = etNota.getText().toString().trim();
 
@@ -232,15 +243,13 @@ public class EditarAlarmaActivity extends AppCompatActivity {
                     ubicacionSeleccionada.latitude,
                     ubicacionSeleccionada.longitude,
                     nuevoRadio,
-                    true,
+                    alarmaActiva,
                     categoriaSeleccionadaId,
                     nuevaNota
             );
             actualizada.setId(alarmaId);
-            actualizada.setId(alarmaId);
             viewModel.actualizar(actualizada);
 
-            // Guardamos la repetición actualizada
             new Thread(() -> {
                 Repeticion rep = new Repeticion(alarmaId, repLunes, repMartes, repMiercoles,
                         repJueves, repViernes, repSabado, repDomingo);
@@ -251,6 +260,7 @@ public class EditarAlarmaActivity extends AppCompatActivity {
 
         btnCancelar.setOnClickListener(v -> finish());
 
+        // Boton eliminar
         btnEliminar.setOnClickListener(v -> {
             Alarma alarma = new Alarma(nombre, latitud, longitud, radio, true, categoriaSeleccionadaId, nota);
             alarma.setId(alarmaId);

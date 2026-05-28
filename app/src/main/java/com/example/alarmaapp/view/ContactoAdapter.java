@@ -15,6 +15,7 @@ import com.example.alarmaapp.model.Contacto;
 import java.util.ArrayList;
 import java.util.List;
 
+// Adapter para la lista de contactos, igual al de categorias
 public class ContactoAdapter extends RecyclerView.Adapter<ContactoAdapter.ContactoViewHolder> {
 
     private List<Contacto> contactos = new ArrayList<>();

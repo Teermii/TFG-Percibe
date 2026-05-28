@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, ConfiguracionActivity.class)));
     }
 
+    // Pedimos los permisos en cascada (solo se pueden pedir de 1 en 1)
     private void pedirPermisosUbicacion() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Si se acepta un permiso se invoca al metodo de pedir otra vez para pedir el siguiente
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {

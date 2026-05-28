@@ -8,7 +8,6 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import com.example.alarmaapp.model.Categoria;
-
 import java.util.List;
 
 @Dao
@@ -23,9 +22,11 @@ public interface CategoriaDao {
     @Delete
     void eliminar(Categoria categoria);
 
+    // Categorias ordenadas alfabeticamente
     @Query("SELECT * FROM categorias ORDER BY nombre ASC")
     LiveData<List<Categoria>> getTodasLasCategorias();
 
+    // Directo, sin LiveData (por si se necesita en segundo plano)
     @Query("SELECT * FROM categorias WHERE id = :id")
     Categoria getCategoriaPorIdDirecto(long id);
 }

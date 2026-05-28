@@ -28,7 +28,7 @@ public class GeofenceManager {
         geofencingClient = LocationServices.getGeofencingClient(context);
     }
 
-    // PendintIntent que apunta a la clase GeofenceBroadcastReceiver, cuando se activa, llama a esa clase (lanzara la noti)
+    // "Sobre cerrado" que apunta al receiver. Android lo abrira cuando se cumpla la condición
     private PendingIntent getPendingIntent() {
         Intent intent = new Intent(context, GeofenceBroadcastReceiver.class);
         return PendingIntent.getBroadcast(

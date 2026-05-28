@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+// Pantalla de estadisticas
 public class EstadisticasActivity extends AppCompatActivity {
 
     private AlarmaViewModel alarmaViewModel;
@@ -40,7 +41,7 @@ public class EstadisticasActivity extends AppCompatActivity {
         alarmaViewModel    = new ViewModelProvider(this).get(AlarmaViewModel.class);
         historialViewModel = new ViewModelProvider(this).get(HistorialViewModel.class);
 
-        // ── Lista de alarmas (al tocar una vas a su detalle) ─────────────────
+        // Lista de alarmas (al tocar una vas a su detalle)
         adapter = new AlarmaAdapter(alarmaViewModel, alarma -> {
             Intent intent = new Intent(this, DetalleEstadisticasActivity.class);
             intent.putExtra("alarmaId", alarma.getId());
@@ -57,7 +58,7 @@ public class EstadisticasActivity extends AppCompatActivity {
             recyclerView.setVisibility(alarmas.isEmpty() ? View.GONE : View.VISIBLE);
         });
 
-        // ── Estadísticas globales ────────────────────────────────────────────
+        // Estadisticas globales
         historialViewModel.getTotalActivaciones().observe(this, total ->
                 tvTotal.setText(String.valueOf(total != null ? total : 0)));
 
@@ -66,6 +67,7 @@ public class EstadisticasActivity extends AppCompatActivity {
         historialViewModel.getActivacionesHoy(hoy).observe(this, hoyTotal ->
                 tvHoy.setText(String.valueOf(hoyTotal != null ? hoyTotal : 0)));
 
+        // Alarma mas activada
         historialViewModel.getAlarmaMasActivada().observe(this, masActivada -> {
             if (masActivada != null) {
                 tvMasActivada.setText(masActivada.nombreAlarma);

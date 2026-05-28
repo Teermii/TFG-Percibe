@@ -14,6 +14,7 @@ import com.example.alarmaapp.model.HistorialActivacion;
 import java.util.ArrayList;
 import java.util.List;
 
+// Adapter del historial de activacion, simplemente muestra fecha y hora
 public class HistorialAdapter extends RecyclerView.Adapter<HistorialAdapter.HistorialViewHolder> {
 
     private List<HistorialActivacion> historial = new ArrayList<>();

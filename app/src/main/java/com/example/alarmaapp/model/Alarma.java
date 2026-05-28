@@ -12,9 +12,9 @@ import androidx.room.ForeignKey;
                 entity = Categoria.class,
                 parentColumns = "id",
                 childColumns = "categoriaId",
-                onDelete = ForeignKey.SET_NULL // Si se borra la categoría, la alarma queda sin categoría
+                onDelete = ForeignKey.SET_NULL // Si se borra la categoria, la alarma queda sin categoría
         )
-) // "alarmas" será el nombre de la tabla
+) // "alarmas" sera el nombre de la tabla
 public class Alarma {
 
     // Cada atributo será una columna de la tabla
@@ -26,7 +26,7 @@ public class Alarma {
     private double longitud;
     private double radio;
     private boolean activa;
-    private Long categoriaId; // Long con mayúscula para permitir null (sin categoría)
+    private Long categoriaId; // Long con mayuscula para permitir null (sin categoría)
     private String nota;
 
     // Constructor

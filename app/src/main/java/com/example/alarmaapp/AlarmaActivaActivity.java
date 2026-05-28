@@ -12,6 +12,7 @@ import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+// Pantalla que se muestra cuando suena la alarma
 public class AlarmaActivaActivity extends AppCompatActivity {
 
     private boolean alarmaParada = false;
@@ -50,6 +51,7 @@ public class AlarmaActivaActivity extends AppCompatActivity {
             tvNota.setVisibility(View.GONE);
         }
 
+        // EL boton de parar la alarma
         btnParar.setOnClickListener(v -> pararAlarma());
     }
 
@@ -73,8 +75,10 @@ public class AlarmaActivaActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Si la activity se destruye sin que el usuario pulsara "Parar" (ej. sistema la mata),
-        // también paramos el servicio para no dejar la alarma sonando indefinidamente.
+        /* Si la activity se destruye sin que el usuario pulsara "Parar" (ej. sistema la mata),
+         * también paramos el servicio para no dejar la alarma sonando indefinidamente
+         */
+
         if (!alarmaParada) {
             Intent stop = new Intent(this, AlarmaService.class);
             stop.setAction(AlarmaService.ACTION_STOP);

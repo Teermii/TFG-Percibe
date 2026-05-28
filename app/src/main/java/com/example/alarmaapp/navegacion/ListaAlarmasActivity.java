@@ -10,6 +10,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.alarmaapp.crud.EditarAlarmaActivity;
 import com.example.alarmaapp.crud.NuevaAlarmaActivity;
 import com.example.alarmaapp.R;
+import com.example.alarmaapp.model.Alarma;
 import com.example.alarmaapp.model.Categoria;
 import com.example.alarmaapp.view.AlarmaAdapter;
 import com.example.alarmaapp.viewmodel.AlarmaViewModel;
@@ -34,9 +36,10 @@ public class ListaAlarmasActivity extends AppCompatActivity {
     private TextView tvVacia;
     private RecyclerView recyclerView;
 
-    // Lista de categorías para el spinner
+    // Lista de categorias para el spinner
     private List<Categoria> listaCategorias = new ArrayList<>();
     private Long categoriaFiltradaId = null; // null = mostrar todas
+    private LiveData<List<Alarma>> alarmasObservadas = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +47,14 @@ public class ListaAlarmasActivity extends AppCompatActivity {
         setContentView(R.layout.activity_lista_alarmas);
 
         recyclerView = findViewById(R.id.recyclerView);
-        tvVacia      = findViewById(R.id.tvVacia);
+        tvVacia      = findViewById(R.id.tvVacia); // mensaje de "no hay alarmas"
         Spinner spinnerCategorias    = findViewById(R.id.spinnerCategorias);
         ImageButton btnCategorias    = findViewById(R.id.btnCategorias);
         FloatingActionButton fabAnadir = findViewById(R.id.fabAnadir);
 
         alarmaViewModel     = new ViewModelProvider(this).get(AlarmaViewModel.class);
         categoriaViewModel  = new ViewModelProvider(this).get(CategoriaViewModel.class);
+
 
         adapter = new AlarmaAdapter(alarmaViewModel, alarma -> {
             Intent intent = new Intent(this, EditarAlarmaActivity.class);
@@ -69,12 +73,12 @@ public class ListaAlarmasActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // ── Spinner de categorías ─────────────────────────────────────────────
+        // Desplegable de categorías
         categoriaViewModel.getTodasLasCategorias().observe(this, categorias -> {
             listaCategorias = categorias;
             adapter.setCategorias(categorias);
 
-            // Primera opción siempre es "Todas"
+            // Primera opcion siempre es "Todas"
             List<String> nombres = new ArrayList<>();
             nombres.add("Todas");
             for (Categoria c : categorias) nombres.add(c.getNombre());
@@ -86,11 +90,12 @@ public class ListaAlarmasActivity extends AppCompatActivity {
             spinnerCategorias.setAdapter(spinnerAdapter);
         });
 
+        // Al elegir categoria en el desplegable, filtraremos
         spinnerCategorias.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position == 0) {
-                    // "Todas" → sin filtro
+                    // sin filtro = todas
                     categoriaFiltradaId = null;
                     observarTodasLasAlarmas();
                 } else if (position - 1 < listaCategorias.size()) {
@@ -104,7 +109,6 @@ public class ListaAlarmasActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // ── Botón categorías ──────────────────────────────────────────────────
         btnCategorias.setOnClickListener(v ->
                 startActivity(new Intent(this, CategoriasActivity.class)));
 
@@ -112,19 +116,22 @@ public class ListaAlarmasActivity extends AppCompatActivity {
                 startActivity(new Intent(this, NuevaAlarmaActivity.class)));
     }
 
-    private void observarTodasLasAlarmas() {
-        alarmaViewModel.getTodasLasAlarmas().observe(this, alarmas -> {
+    // Cambia la fuente de datos activa y elimina el observer anterior para evitar acumulación
+    private void setAlarmasObserver(LiveData<List<Alarma>> liveData) {
+        if (alarmasObservadas != null) alarmasObservadas.removeObservers(this);
+        alarmasObservadas = liveData;
+        liveData.observe(this, alarmas -> {
             adapter.setAlarmas(alarmas);
             tvVacia.setVisibility(alarmas.isEmpty() ? View.VISIBLE : View.GONE);
             recyclerView.setVisibility(alarmas.isEmpty() ? View.GONE : View.VISIBLE);
         });
     }
 
+    private void observarTodasLasAlarmas() {
+        setAlarmasObserver(alarmaViewModel.getTodasLasAlarmas());
+    }
+
     private void observarAlarmasPorCategoria(long categoriaId) {
-        alarmaViewModel.getAlarmasPorCategoria(categoriaId).observe(this, alarmas -> {
-            adapter.setAlarmas(alarmas);
-            tvVacia.setVisibility(alarmas.isEmpty() ? View.VISIBLE : View.GONE);
-            recyclerView.setVisibility(alarmas.isEmpty() ? View.GONE : View.VISIBLE);
-        });
+        setAlarmasObserver(alarmaViewModel.getAlarmasPorCategoria(categoriaId));
     }
 }

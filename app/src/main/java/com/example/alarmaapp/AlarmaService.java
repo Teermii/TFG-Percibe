@@ -21,7 +21,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.example.alarmaapp.database.AppDatabase;
 import com.example.alarmaapp.model.Configuracion;
-
+// Servicio que hacer sonar y vibrar la alarma, funciona en segundo plano
 public class AlarmaService extends Service {
 
     public static final String CHANNEL_ID = "alarma_channel";
@@ -35,10 +35,11 @@ public class AlarmaService extends Service {
     private AudioManager audioManager;
     private int volumenOriginal = -1;
 
-    // Handler para la parada automática
+    // Handler para la parada automatica
     private Handler handler;
     private Runnable runnableParada;
 
+    // Se ejecuta cuando alguien arranca el servicio
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && ACTION_STOP.equals(intent.getAction())) {
@@ -46,13 +47,14 @@ public class AlarmaService extends Service {
             return START_NOT_STICKY;
         }
 
+        // Guardamos el nombre y la nota de la alarma
         String nombre = intent != null ? intent.getStringExtra("nombre") : null;
         String nota   = intent != null ? intent.getStringExtra("nota")   : null;
 
         crearCanalNotificacion();
         startForeground(NOTIF_ID, construirNotificacion(nombre, nota));
 
-        // ── Leer configuración en hilo secundario ────────────────────────────
+        // Leemos la configuracion en un hilo secundario, Room no se puede leer en el principal
         new Thread(() -> {
             AppDatabase db = AppDatabase.getInstance(getApplicationContext());
             Configuracion config = db.configuracionDao().getConfiguracionDirecto();
@@ -69,34 +71,37 @@ public class AlarmaService extends Service {
         return START_NOT_STICKY;
     }
 
+    // Aplica sonido, vibración y parada automática según la configuracion
     private void aplicarConfiguracion(Configuracion config) {
-        // ── Sonido ────────────────────────────────────────────────────────────
+        // Sonido
         if (config.isSonido()) {
-            // Ajustamos el volumen del stream de alarma según la configuración
+            // Ajustamos el volumen del stream de alarma segun la configuración
             audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
             if (audioManager != null) {
                 int maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
                 volumenOriginal = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
-                int volumenNuevo = (int) (maxVol * (config.getVolumen() / 100f));
+                int volumenNuevo = Math.round(maxVol * (config.getVolumen() / 100f));
                 audioManager.setStreamVolume(AudioManager.STREAM_ALARM, volumenNuevo, 0);
             }
 
+            // Cogemos el sonido de alarma del sistema y lo reproducimos
             Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
             ringtone = RingtoneManager.getRingtone(this, uri);
             if (ringtone != null) ringtone.play();
         }
 
-        // ── Vibración ─────────────────────────────────────────────────────────
+        // Vibracion
         if (config.isVibracion()) {
             vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
             if (vibrator != null) {
+                // Espera 0ms, vibra 1000ms, espera 500ms. El 0 final = repetir
                 long[] patron = {0, 1000, 500};
                 vibrator.vibrate(VibrationEffect.createWaveform(patron, 0));
             }
         }
 
-        // ── Parada automática ─────────────────────────────────────────────────
-        // tiempoParadaSeg = 0 significa que NO se para automáticamente
+        // Parada automatica
+        // tiempoParadaSeg = 0 significa que no se para automaticamente
         if (config.getTiempoParadaSeg() > 0) {
             handler = new Handler(Looper.getMainLooper());
             runnableParada = this::stopSelf;
@@ -104,6 +109,7 @@ public class AlarmaService extends Service {
         }
     }
 
+    // Construye la notificación que abre la pantalla de alarma
     private Notification construirNotificacion(String nombre, String nota) {
         Intent activityIntent = new Intent(this, AlarmaActivaActivity.class);
         activityIntent.putExtra("nombre", nombre);
@@ -119,14 +125,16 @@ public class AlarmaService extends Service {
                 .setSmallIcon(R.drawable.icono_alarma)
                 .setContentTitle(nombre != null ? nombre : "Alarma")
                 .setContentText(nota != null && !nota.isEmpty() ? nota : "Toca para ver la alarma")
-                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setPriority(NotificationCompat.PRIORITY_MAX) // Mxima prioridad
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
+                // Enciende la pantalla y muestra la activity aun con el movil bloqueado
                 .setFullScreenIntent(fullScreenPI, true)
                 .setOngoing(true)
                 .setAutoCancel(false)
                 .build();
     }
 
+    // Crea el canal de notificaciones (obligatorio desde Android 8)
     private void crearCanalNotificacion() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
@@ -135,14 +143,15 @@ public class AlarmaService extends Service {
                     NotificationManager.IMPORTANCE_HIGH
             );
             channel.setDescription("Notificaciones de alarma geolocalizada");
-            channel.setSound(null, null);
-            channel.setBypassDnd(true);
+            channel.setSound(null, null); // el sonido lo gestionamos nosotros
+            channel.setBypassDnd(true); // ignora el modo "No molestar"
             channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) manager.createNotificationChannel(channel);
         }
     }
 
+    // Se ejecuta cuando el servicio se destruye (al parar la alarma)
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -151,12 +160,12 @@ public class AlarmaService extends Service {
         if (ringtone != null && ringtone.isPlaying()) ringtone.stop();
         if (vibrator != null) vibrator.cancel();
 
-        // Restauramos el volumen original del usuario
+        // Devolvemos el volumen al usuario tal como estaba
         if (audioManager != null && volumenOriginal >= 0) {
             audioManager.setStreamVolume(AudioManager.STREAM_ALARM, volumenOriginal, 0);
         }
 
-        // Cancelamos la parada automática si estaba programada
+        // Cancelamos la parada automatica si estaba programada
         if (handler != null && runnableParada != null) {
             handler.removeCallbacks(runnableParada);
         }

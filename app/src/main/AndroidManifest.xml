@@ -31,7 +31,7 @@
 
         <receiver
             android:name=".view.GeofenceBroadcastReceiver"
-            android:exported="true" />
+            android:exported="false" />
 
         <!-- Re-registra las geocercas cuando el dispositivo termina de arrancar.
              Sin esto, al reiniciar el movil, las alarmas dejarian de funcionar. -->

@@ -11,7 +11,7 @@ import com.example.alarmaapp.model.Repeticion;
 @Dao
 public interface RepeticionDao {
 
-    // OnConflictStrategy.REPLACE: si ya existe una repetición para esta alarma, la reemplaza
+    // OnConflictStrategy.REPLACE: si ya existe una repeticion para esta alarma, la reemplaza
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertar(Repeticion repeticion);
 

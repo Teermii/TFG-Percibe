@@ -12,6 +12,7 @@ import com.example.alarmaapp.model.Configuracion;
 import com.example.alarmaapp.viewmodel.ConfiguracionViewModel;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
+// Pntalla de ajustes del volumen, vibracion y tiempo hasta parar
 public class ConfiguracionActivity extends AppCompatActivity {
 
     private ConfiguracionViewModel viewModel;
@@ -56,7 +57,7 @@ public class ConfiguracionActivity extends AppCompatActivity {
             tvTiempoValor.setText(formatearTiempo(configActual.getTiempoParadaSeg()));
         });
 
-        // ── Listeners — guardan cada cambio inmediatamente ─────────────────────
+        // Volcamos los valores guardados en los controles
         switchSonido.setOnCheckedChangeListener((btn, isChecked) -> {
             if (configActual != null) {
                 configActual.setSonido(isChecked);
@@ -64,6 +65,7 @@ public class ConfiguracionActivity extends AppCompatActivity {
             }
         });
 
+        // Vibracion
         switchVibracion.setOnCheckedChangeListener((btn, isChecked) -> {
             if (configActual != null) {
                 configActual.setVibracion(isChecked);
@@ -71,6 +73,7 @@ public class ConfiguracionActivity extends AppCompatActivity {
             }
         });
 
+        // Volumen
         seekVolumen.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -87,6 +90,7 @@ public class ConfiguracionActivity extends AppCompatActivity {
             }
         });
 
+        // Tiempo hasta la parada automatica
         seekTiempo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -104,7 +108,7 @@ public class ConfiguracionActivity extends AppCompatActivity {
         });
     }
 
-    /** Formatea los segundos a "30 seg" / "1 min" / "2 min 30 seg" */
+    // Formatea los segundos a "30 seg" "1 min" "2 min 30 seg"
     private String formatearTiempo(int segundos) {
         if (segundos == 0) return "Nunca (manual)";
         if (segundos < 60) return segundos + " seg";

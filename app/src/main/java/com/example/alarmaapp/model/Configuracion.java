@@ -2,10 +2,9 @@ package com.example.alarmaapp.model;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-
-/**
+/*
  * Tabla con UNA sola fila que guarda la configuración global de la app.
- * El id es siempre 1 — solo hay una configuración en toda la app.
+ * El id es siempre 1, solo hay una configuración en toda la app.
  */
 @Entity(tableName = "configuracion")
 public class Configuracion {
@@ -13,10 +12,10 @@ public class Configuracion {
     @PrimaryKey
     private int id = 1; // Siempre 1, solo existe una fila
 
-    private boolean sonido;       // ¿Reproduce sonido al activarse?
-    private boolean vibracion;    // ¿Vibra al activarse?
-    private int volumen;          // 0-100 (porcentaje del volumen del sistema)
-    private int tiempoParadaSeg;  // Segundos hasta parar automáticamente (0 = nunca)
+    private boolean sonido;
+    private boolean vibracion;
+    private int volumen;
+    private int tiempoParadaSeg;
 
     public Configuracion() {
         // Valores por defecto

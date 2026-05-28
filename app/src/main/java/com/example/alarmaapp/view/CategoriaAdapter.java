@@ -16,6 +16,7 @@ import com.example.alarmaapp.model.Categoria;
 import java.util.ArrayList;
 import java.util.List;
 
+// Adapter para la lista de categorias
 public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.CategoriaViewHolder> {
 
     private List<Categoria> categorias = new ArrayList<>();
@@ -50,7 +51,7 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.Cate
         Categoria categoria = categorias.get(position);
 
         holder.tvNombre.setText(categoria.getNombre());
-        // Pintamos el círculo de color con el color de la categoría
+        // Pintamos el circulo de color con el color de la categoria
         holder.vColor.setBackgroundColor(Color.parseColor(categoria.getColor()));
 
         holder.itemView.setOnClickListener(v -> onClickListener.onClick(categoria));

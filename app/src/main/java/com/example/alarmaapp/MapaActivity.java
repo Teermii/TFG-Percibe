@@ -29,12 +29,14 @@ public class MapaActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LatLng ubicacionSeleccionada;
     private Circle circuloActual;
     private EditText etBuscar;
+    private double radio = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mapa);
 
+        radio    = getIntent().getDoubleExtra("radio", 100);
         etBuscar = findViewById(R.id.etBuscar);
         Button btnBuscar = findViewById(R.id.btnBuscar);
         Button btnConfirmar = findViewById(R.id.btnConfirmar);
@@ -115,7 +117,7 @@ public class MapaActivity extends AppCompatActivity implements OnMapReadyCallbac
         // segun las coordenadas agregamos al mapa el nuevo circulo (lo dibujamos)
         circuloActual = mMap.addCircle(new CircleOptions()
                 .center(coordenadas)
-                .radius(100)
+                .radius(radio)
                 .strokeColor(0xFF0000FF)
                 .fillColor(0x220000FF));
     }

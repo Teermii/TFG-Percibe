@@ -12,6 +12,7 @@ import com.example.alarmaapp.R;
 import com.example.alarmaapp.view.HistorialAdapter;
 import com.example.alarmaapp.viewmodel.HistorialViewModel;
 
+// Activaciones de cada alarma
 public class DetalleEstadisticasActivity extends AppCompatActivity {
 
     @Override
@@ -40,12 +41,12 @@ public class DetalleEstadisticasActivity extends AppCompatActivity {
             adapter.setHistorial(historial);
         });
 
-        // Número de activaciones
+        // Numero de activaciones
         viewModel.getNumActivaciones(alarmaId).observe(this, num -> {
             tvNumActivaciones.setText(num + " activaciones");
         });
 
-        // Última activación
+        // Ultima activacion
         viewModel.getUltimaActivacion(alarmaId).observe(this, ultima -> {
             if (ultima != null) {
                 tvUltima.setText("Última: " + ultima.getFecha() + " a las " + ultima.getHora());

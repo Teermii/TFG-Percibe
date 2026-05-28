@@ -1,6 +1,5 @@
 package com.example.alarmaapp.navegacion;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -21,6 +20,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
 
+// Mapa que muestra todas las alarmas a la vez
 public class MapaGeneralActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -44,7 +44,7 @@ public class MapaGeneralActivity extends AppCompatActivity implements OnMapReady
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Cuando el mapa esté listo observamos las alarmas y las pintamos
+        // Observamos las alarmas, cada vez que cambian, repintamos el mapa
         viewModel.getTodasLasAlarmas().observe(this, alarmas -> {
             mMap.clear(); // Limpiamos el mapa antes de redibujar
             if (alarmas == null || alarmas.isEmpty()) return;
@@ -54,7 +54,7 @@ public class MapaGeneralActivity extends AppCompatActivity implements OnMapReady
 
     private void pintarAlarmas(List<Alarma> alarmas) {
 
-        // Builder para calcular los límites del mapa y que quepan todas las alarmas
+        // Builder para calcular los limites del mapa y que quepan todas las alarmas
         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
 
         for (Alarma alarma : alarmas) {
@@ -67,7 +67,7 @@ public class MapaGeneralActivity extends AppCompatActivity implements OnMapReady
                     .snippet("Radio: " + alarma.getRadio() + "m · " +
                             (alarma.isActiva() ? "Activa" : "Inactiva")));
 
-            // Círculo azul que representa la zona de la alarma
+            // Circulo azul que representa la zona de la alarma
             mMap.addCircle(new CircleOptions()
                     .center(posicion)
                     .radius(alarma.getRadio())
@@ -86,10 +86,5 @@ public class MapaGeneralActivity extends AppCompatActivity implements OnMapReady
             mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(
                     boundsBuilder.build(), 150));
         }
-
-        // Listener para el popup al tocar una chincheta
-        mMap.setOnInfoWindowClickListener(marker -> {
-            // Aquí podrías abrir el detalle de la alarma en el futuro
-        });
     }
 }

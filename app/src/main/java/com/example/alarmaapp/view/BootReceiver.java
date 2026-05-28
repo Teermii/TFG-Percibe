@@ -15,13 +15,12 @@ import com.example.alarmaapp.repository.GeofenceManager;
 
 import java.util.List;
 
-/* Cuando Android reinicia el dispositivo borra TODAS las geocercas registradas.
- * Si no hicieramos nada, las alarmas seguirian guardadas en la base de datos pero
+/* Cuando Android reinicia el dispositivo borra todas las geocercas registradas,
+ * si no hicieramos nada, las alarmas seguirian guardadas en la base de datos pero
  * el sistema ya no estaria vigilando las zonas, asi que nunca se dispararian.
- *
  * Este BroadcastReceiver se ejecuta justo despues de que el dispositivo termina
  * de arrancar (action BOOT_COMPLETED) y vuelve a registrar todas las alarmas
- * que estuvieran activas.
+ * que estuvieran activas
  */
 public class BootReceiver extends BroadcastReceiver {
 
@@ -31,15 +30,14 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (intent == null || intent.getAction() == null) return;
 
-        // Aceptamos BOOT_COMPLETED y tambien LOCKED_BOOT_COMPLETED por si la app
-        // tiene que arrancar antes de desbloquear
+        // Aceptamos BOOT_COMPLETED y tambien LOCKED_BOOT_COMPLETED por si la app tiene que arrancar antes de desbloquear
         String action = intent.getAction();
         boolean esBoot = Intent.ACTION_BOOT_COMPLETED.equals(action)
                 || "android.intent.action.LOCKED_BOOT_COMPLETED".equals(action)
                 || "android.intent.action.QUICKBOOT_POWERON".equals(action);
         if (!esBoot) return;
 
-        // Sin permiso de ubicacion no podemos registrar nada, salimos sin hacer ruido
+        // Sin permiso de ubicacion no podemos registrar nada, salimos
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             Log.w(TAG, "Sin permiso de ubicacion, no se re-registran las geocercas");
@@ -47,7 +45,7 @@ public class BootReceiver extends BroadcastReceiver {
         }
 
         // Como onReceive corre en el hilo principal y solo nos dan unos segundos,
-        // usamos goAsync() para tener mas tiempo y trabajamos en un hilo aparte.
+        // usamos goAsync() para tener mas tiempo y trabajamos en un hilo aparte
         final PendingResult pendingResult = goAsync();
 
         new Thread(() -> {
