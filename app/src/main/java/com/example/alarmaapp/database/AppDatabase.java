@@ -17,7 +17,11 @@ import com.example.alarmaapp.model.Configuracion;
 @Database(
         entities = {Alarma.class, HistorialActivacion.class, Categoria.class,
                 Repeticion.class, Contacto.class, Configuracion.class },
+<<<<<<< HEAD
         version = 10,
+=======
+        version = 8,
+>>>>>>> b43534b4eaad35c67556c7bffae87d2c2bf6ec8f
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {

@@ -100,7 +100,12 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
                 String hora  = new SimpleDateFormat("HH:mm", Locale.getDefault())
                         .format(new Date());
 
+<<<<<<< HEAD
                     db.historialDao().insertar(new HistorialActivacion(alarma.getId(), fecha, hora));
+=======
+                db.historialDao().insertar(new HistorialActivacion(
+                        alarma.getId(), alarma.getNombre(), fecha, hora));
+>>>>>>> b43534b4eaad35c67556c7bffae87d2c2bf6ec8f
 
                 // Enviar SMS a los contactos
                 enviarSmsContactos(context, db, alarma.getId());

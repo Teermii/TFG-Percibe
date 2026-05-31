@@ -37,9 +37,14 @@ public interface HistorialDao {
     LiveData<Integer> getTotalActivaciones();
 
     // Alarma que mas se ha activado (nombre + cuantas veces)
+<<<<<<< HEAD
     @Query("SELECT a.nombre AS nombreAlarma, COUNT(*) AS veces " +
             "FROM historial h JOIN alarmas a ON a.id = h.alarmaId " +
             "GROUP BY h.alarmaId ORDER BY veces DESC LIMIT 1")
+=======
+    @Query("SELECT nombreAlarma, COUNT(*) as veces FROM historial " +
+            "GROUP BY alarmaId ORDER BY veces DESC LIMIT 1")
+>>>>>>> b43534b4eaad35c67556c7bffae87d2c2bf6ec8f
     LiveData<AlarmaMasActivada> getAlarmaMasActivada();
 
     // Activaciones de hoy
