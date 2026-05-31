@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#1A73E8"
+    android:padding="32dp">
+
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="32dp"
+        android:src="@android:drawable/ic_menu_mylocation"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="¡Alarma activada!"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:layout_marginBottom="12dp"/>
+
+    <TextView
+        android:id="@+id/tvNombre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="64dp"/>
+
+    <TextView
+        android:id="@+id/tvNota"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:padding="20dp"
+        android:layout_marginBottom="32dp"
+        android:background="#221A73E8"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/btnParar"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:text="PARAR"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#1A73E8"
+        android:backgroundTint="#FFFFFF"
+        style="@style/Widget.MaterialComponents.Button"/>
+
+</LinearLayout>

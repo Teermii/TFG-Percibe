@@ -1,0 +1,3 @@
+# Renombra este archivo a `local.properties` (o copia su contenido a tu local.properties existente)
+# y pon aqui TU clave de Google Maps. Este fichero NO se sube a Git, asi tu key esta a salvo.
+MAPS_API_KEY=AIzaSy...PEGA_AQUI_TU_KEY
