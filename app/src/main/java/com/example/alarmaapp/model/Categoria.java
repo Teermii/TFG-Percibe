@@ -3,24 +3,17 @@ package com.example.alarmaapp.model;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-<<<<<<< HEAD
 import org.jetbrains.annotations.NotNull;
 
-=======
->>>>>>> b43534b4eaad35c67556c7bffae87d2c2bf6ec8f
 @Entity(tableName = "categorias")
 public class Categoria {
 
     @PrimaryKey(autoGenerate = true)
     private long id;
 
-<<<<<<< HEAD
     @NotNull
     private String nombre;  // Ej: "Trabajo", "Casa"
     @NotNull
-=======
-    private String nombre;  // Ej: "Trabajo", "Casa"
->>>>>>> b43534b4eaad35c67556c7bffae87d2c2bf6ec8f
     private String color;   // Ej: "#1A73E8"
 
     public Categoria(String nombre, String color) {

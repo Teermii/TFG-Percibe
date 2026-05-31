@@ -1,18 +1,12 @@
 package com.example.alarmaapp.model;
 
 import androidx.room.Entity;
-<<<<<<< HEAD
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 import androidx.room.ForeignKey;
 
 import org.jetbrains.annotations.NotNull;
 
-=======
-import androidx.room.PrimaryKey;
-import androidx.room.ForeignKey;
-
->>>>>>> b43534b4eaad35c67556c7bffae87d2c2bf6ec8f
 // Hacemos que esta clase sea una tabla de la base de datos
 
 @Entity(
@@ -22,12 +16,8 @@ import androidx.room.ForeignKey;
                 parentColumns = "id",
                 childColumns = "categoriaId",
                 onDelete = ForeignKey.SET_NULL // Si se borra la categoria, la alarma queda sin categoría
-<<<<<<< HEAD
         ),
         indices = {@Index("categoriaId")}
-=======
-        )
->>>>>>> b43534b4eaad35c67556c7bffae87d2c2bf6ec8f
 ) // "alarmas" sera el nombre de la tabla
 public class Alarma {
 
@@ -35,10 +25,7 @@ public class Alarma {
     @PrimaryKey(autoGenerate = true)
     private long id;
 
-<<<<<<< HEAD
     @NotNull
-=======
->>>>>>> b43534b4eaad35c67556c7bffae87d2c2bf6ec8f
     private String nombre;
     private double latitud;
     private double longitud;

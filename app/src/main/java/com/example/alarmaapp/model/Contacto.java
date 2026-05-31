@@ -5,11 +5,8 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-<<<<<<< HEAD
 import org.jetbrains.annotations.NotNull;
 
-=======
->>>>>>> b43534b4eaad35c67556c7bffae87d2c2bf6ec8f
 @Entity(
         tableName = "contactos",
         foreignKeys = @ForeignKey(
@@ -27,16 +24,11 @@ public class Contacto {
     private long id;
 
     private long alarmaId;     // A que alarma pertenece este contacto
-<<<<<<< HEAD
     @NotNull
     private String nombre;     // Nombre del contacto
     @NotNull
     private String telefono;   // Numero "+34666123456"
     @NotNull
-=======
-    private String nombre;     // Nombre del contacto
-    private String telefono;   // Numero "+34666123456"
->>>>>>> b43534b4eaad35c67556c7bffae87d2c2bf6ec8f
     private String mensaje;    // Mensaje que se enviara al activar la alarma
 
     public Contacto(long alarmaId, String nombre, String telefono, String mensaje) {
