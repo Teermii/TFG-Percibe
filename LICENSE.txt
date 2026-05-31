@@ -1,10 +1,6 @@
 MIT License
 
-<<<<<<< HEAD
 Copyright (c) 2025 Nathan D. Señor Gomez
-=======
-Copyright (c) 2026 Nathan D. Señor Gomez
->>>>>>> b43534b4eaad35c67556c7bffae87d2c2bf6ec8f
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
